@@ -107,6 +107,7 @@ public class WordCount extends AbstractHadoopJob {
 
     // hadoop conf should be on the classpath
     JobConf jobconf = getJobConf();
+    jobconf.setJobName(this.getClass().getSimpleName());
     jobconf.setJarByClass(WordCount.class);
 
     jobconf.setOutputKeyClass(Text.class);

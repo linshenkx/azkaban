@@ -21,7 +21,7 @@ import java.util.Set;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.hadoop.fs.permission.AccessControlException;
+import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;

@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.AccessControlException;
+import org.apache.hadoop.security.AccessControlException;
 import org.apache.log4j.Logger;
 
 public class HtmlFileViewer extends HdfsFileViewer {
@@ -82,8 +82,9 @@ public class HtmlFileViewer extends HdfsFileViewer {
   public void displayFile(final FileSystem fs, final Path path, final OutputStream outputStream,
       final int startLine, final int endLine) throws IOException {
 
-    if (logger.isDebugEnabled())
+    if (logger.isDebugEnabled()) {
       logger.debug("read in uncompressed html file");
+    }
 
     // BUFFER_LIMIT is the only thing we care about, line limit is redundant and actually not
     // very useful for html files. Thus using Integer.MAX_VALUE to effectively remove the endLine limit.

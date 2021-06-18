@@ -1,11 +1,6 @@
 package azkaban.viewer.hdfs;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.EnumSet;
-import java.util.Set;
-
+import azkaban.viewer.hdfs.utils.SerDeUtilsWrapper;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.io.orc.OrcFile;
@@ -15,7 +10,11 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import azkaban.viewer.hdfs.utils.SerDeUtilsWrapper;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * This class implements a viewer for ORC files

@@ -54,11 +54,18 @@ allprojects {
   }
 }
 
-ext.versions = [hadoop: '2.6.1',
-                hive  : '1.1.0',
+ext.versions = [hadoop: '3.3.0',
+                hive  : '3.1.2',
+                hbase : '2.2.4',
                 pig   : '0.11.0',
                 restli: '1.15.7',
                 slf4j : '1.7.18',]
+//ext.versions = [hadoop: '2.9.2',
+//                hive  : '1.1.0',
+//                hbase : '2.2.4',
+//                pig   : '0.11.0',
+//                restli: '1.15.7',
+//                slf4j : '1.7.18',]
 
 ext.deps = [
     // External dependencies
@@ -80,8 +87,10 @@ ext.deps = [
     hadoopAuth           : "org.apache.hadoop:hadoop-auth:" + versions.hadoop,
     hadoopCommon         : "org.apache.hadoop:hadoop-common:" + versions.hadoop,
     hadoopHdfs           : "org.apache.hadoop:hadoop-hdfs:" + versions.hadoop,
+    hadoopHdfsClient     : "org.apache.hadoop:hadoop-hdfs-client:" + versions.hadoop,
     hadoopMRClientCommon : "org.apache.hadoop:hadoop-mapreduce-client-common:" + versions.hadoop,
     hadoopMRClientCore   : "org.apache.hadoop:hadoop-mapreduce-client-core:" + versions.hadoop,
+    hbaseMR              : "org.apache.hbase:hbase-mapreduce:" + versions.hbase,
     hiveCli              : "org.apache.hive:hive-cli:" + versions.hive,
     hiveExecCore         : "org.apache.hive:hive-exec:" + versions.hive + ":core",
     hiveMetastore        : "org.apache.hive:hive-metastore:" + versions.hive,

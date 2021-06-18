@@ -261,6 +261,7 @@ public class HdfsBrowserServlet extends LoginAbstractAzkabanServlet {
     try {
       fs = getFileSystem(user);
     } catch (HadoopSecurityManagerException e) {
+      e.printStackTrace();
       errorPage(user, req, resp, session, "Cannot get FileSystem.");
       return;
     }
@@ -398,6 +399,7 @@ public class HdfsBrowserServlet extends LoginAbstractAzkabanServlet {
       try {
         fs = getFileSystem(username);
       } catch (HadoopSecurityManagerException e) {
+        e.printStackTrace();
         errorAjax(response, ret, "Cannot get FileSystem.");
         return;
       }

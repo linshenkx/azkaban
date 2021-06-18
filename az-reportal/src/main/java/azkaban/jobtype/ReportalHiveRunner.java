@@ -19,6 +19,7 @@ package azkaban.jobtype;
 import static azkaban.security.commons.SecurityUtils.MAPREDUCE_JOB_CREDENTIALS_BINARY;
 import static org.apache.hadoop.security.UserGroupInformation.HADOOP_TOKEN_FILE_LOCATION;
 
+import azkaban.jobtype.hiveutil.Utilities;
 import azkaban.reportal.util.BoundedOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -40,7 +41,6 @@ import org.apache.hadoop.hive.cli.CliDriver;
 import org.apache.hadoop.hive.cli.CliSessionState;
 import org.apache.hadoop.hive.cli.OptionsProcessor;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.session.SessionState;
 
 public class ReportalHiveRunner extends ReportalAbstractRunner {

@@ -31,7 +31,7 @@ dependencies {
 
     testCompile deps.hadoopCommon
     compileOnly deps.hiveMetastore
-    compileOnly(deps.hiveExecCore) {
+    compileOnly("org.apache.hive:hive-exec:1.1.0:core") {
         exclude group: 'org.pentaho', module: 'pentaho-aggdesigner-algorithm'
         exclude group: 'eigenbase', module: 'eigenbase-properties'
     }

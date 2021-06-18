@@ -28,7 +28,7 @@ import java.util.HashSet;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.AccessControlException;
+import org.apache.hadoop.security.AccessControlException;
 import org.apache.log4j.Logger;
 
 /**

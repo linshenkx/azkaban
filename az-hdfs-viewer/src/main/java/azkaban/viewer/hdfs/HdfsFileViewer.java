@@ -23,7 +23,7 @@ import java.io.OutputStream;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.AccessControlException;
+import org.apache.hadoop.security.AccessControlException;
 
 public abstract class HdfsFileViewer {
   public abstract String getName();

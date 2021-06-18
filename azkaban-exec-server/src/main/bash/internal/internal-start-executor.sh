@@ -38,6 +38,11 @@ if [ "$HIVE_HOME" != "" ]; then
         CLASSPATH=$CLASSPATH:$HIVE_HOME/conf:$HIVE_HOME/lib/*
 fi
 
+if [ "$HBASE_HOME" != "" ]; then
+  echo "Using Hbase from $HBASE_HOME"
+  CLASSPATH="${CLASSPATH}:${HBASE_HOME}/conf:${HBASE_HOME}/lib/*"
+fi
+
 echo $azkaban_dir;
 echo $CLASSPATH;
 

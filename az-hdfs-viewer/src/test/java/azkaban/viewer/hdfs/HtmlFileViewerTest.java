@@ -10,7 +10,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.AccessControlException;
+import org.apache.hadoop.security.AccessControlException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

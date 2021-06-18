@@ -29,6 +29,7 @@ dependencies {
     compileOnly deps.hadoopAuth
     compileOnly deps.hadoopCommon
     compileOnly deps.hadoopHdfs
+    compileOnly deps.hadoopHdfsClient
     compile deps.httpclient
     compile deps.jetty
     compile deps.jettyUtil
@@ -47,6 +48,7 @@ dependencies {
     testCompile deps.hadoopAuth
     testCompile deps.hadoopCommon
     testCompile deps.hadoopHdfs
+    testCompile deps.hadoopHdfsClient
     testCompile project(':test')
     testCompile project(path: ':azkaban-db', configuration: 'testOutput')
     testCompile deps.commonsCompress
