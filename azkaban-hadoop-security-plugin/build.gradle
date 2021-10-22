@@ -7,7 +7,7 @@ dependencies {
     compileOnly deps.hadoopCommon
     compileOnly deps.hadoopMRClientCommon
     compileOnly deps.hadoopMRClientCore
-    compileOnly deps.hiveMetastore
+    compileOnly deps.hiveMetastore3
     compileOnly group: 'org.apache.hbase', name: 'hbase-mapreduce', version: '2.2.4'
     compileOnly(deps.hiveExecCore) {
         exclude group: 'org.pentaho', module: 'pentaho-aggdesigner-algorithm'

@@ -27,6 +27,13 @@ dependencies {
     compile(deps.hiveCli) {
         transitive = false
     }
+//    compile(deps.hiveMetastore) {
+//        force = true
+//    }
+//    compile("org.apache.hive:hive-shims:3.1.2") {
+//        force = true
+//    }
+
     compile("org.apache.hive:hive-metastore:0.12.0") {
         force = true
     }

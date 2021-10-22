@@ -252,7 +252,7 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
         }
       } catch (final IOException e) {
         throw new HadoopSecurityManagerException(
-            "Failed to login with kerberos ", e);
+                "Failed to login with kerberos ", e);
       }
 
     }
@@ -260,6 +260,60 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
     this.userUgiMap = new ConcurrentHashMap<>();
 
     logger.info("Hadoop Security Manager initialized");
+  }
+
+  public static HadoopSecurityManager getInstance(final Props props)
+          throws HadoopSecurityManagerException, IOException {
+    if (hsmInstance == null) {
+      synchronized (HadoopSecurityManager_H_2_0.class) {
+        if (hsmInstance == null) {
+          logger.info("getting new instance of HadoopSecurityManager");
+          hsmInstance = new HadoopSecurityManager_H_2_0(props);
+        }
+      }
+    }
+
+    logger.debug("Relogging in from keytab if necessary.");
+    hsmInstance.reloginFromKeytab();
+
+    return hsmInstance;
+  }
+
+  private static Token<AuthenticationTokenIdentifier> getHbaseAuthToken(Configuration conf, User user)
+          throws IOException, InterruptedException {
+    ZKWatcher zkw = new ZKWatcher(conf, "TokenUtil-getAuthToken", null);
+    try {
+      String clusterId = ZKClusterId.readClusterIdZNode(zkw);
+      if (clusterId == null) {
+        throw new IOException("Failed to get cluster ID");
+      }
+      return new AuthenticationTokenSelector().selectToken(new Text(clusterId), user.getTokens());
+    } catch (KeeperException e) {
+      throw new IOException(e);
+    } finally {
+      zkw.close();
+    }
+  }
+
+  public static void addHbaseTokenForCred(final Connection conn, User user, Credentials cred)
+          throws IOException, InterruptedException {
+    Token<AuthenticationTokenIdentifier> token = getHbaseAuthToken(conn.getConfiguration(), user);
+    if (token == null) {
+      logger.warn("java.class.path:" + System.getProperty("java.class.path"));
+      ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+      logger.warn("classLoader.getResource(\"\").getPath():" + classLoader.getResource("").getPath());
+      try {
+        classLoader.loadClass("org.apache.hadoop.hbase.LocalHBaseCluster");
+        classLoader.loadClass("org.apache.hadoop.hbase.security.SecurityUtil");
+        classLoader.loadClass("org.apache.hadoop.hbase.security.token.TokenUtil");
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+        throw new IOException(e);
+      }
+      Thread.currentThread().setContextClassLoader(classLoader);
+      token = TokenUtil.obtainToken(conn, user);
+    }
+    cred.addToken(token.getService(), token);
   }
 
   // Disable yyFileSystem Cache for HadoopSecurityManager
@@ -281,23 +335,6 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
     this.conf.setBoolean(FS_DEFAULT_IMPL_DISABLE_CACHE, true);
     logger.info("Disable cache for scheme " + FS_DEFAULT_IMPL_DISABLE_CACHE);
 
-  }
-
-  public static HadoopSecurityManager getInstance(final Props props)
-      throws HadoopSecurityManagerException, IOException {
-    if (hsmInstance == null) {
-      synchronized (HadoopSecurityManager_H_2_0.class) {
-        if (hsmInstance == null) {
-          logger.info("getting new instance of HadoopSecurityManager");
-          hsmInstance = new HadoopSecurityManager_H_2_0(props);
-        }
-      }
-    }
-
-    logger.debug("Relogging in from keytab if necessary.");
-    hsmInstance.reloginFromKeytab();
-
-    return hsmInstance;
   }
 
   /**
@@ -419,7 +456,6 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
     return this.securityEnabled;
   }
 
-
   private void cancelHiveToken(final Token<? extends TokenIdentifier> t,
       final String userToProxy) throws HadoopSecurityManagerException {
     try {
@@ -538,6 +574,7 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
     builder.append(props.getString(HadoopSecurityManager.DOMAIN_NAME));
     return builder.toString();
   }
+
   private void doPrefetch(final File tokenFile, final Props props, final Logger logger,
       final String userToProxy) throws HadoopSecurityManagerException {
     // Create suffix to be added to kerberos principal
@@ -722,43 +759,6 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
         fs.close();
       }
     }
-  }
-
-  private static Token<AuthenticationTokenIdentifier> getHbaseAuthToken(Configuration conf, User user)
-          throws IOException, InterruptedException {
-    ZKWatcher zkw = new ZKWatcher(conf, "TokenUtil-getAuthToken", null);
-    try {
-      String clusterId = ZKClusterId.readClusterIdZNode(zkw);
-      if (clusterId == null) {
-        throw new IOException("Failed to get cluster ID");
-      }
-      return new AuthenticationTokenSelector().selectToken(new Text(clusterId), user.getTokens());
-    } catch (KeeperException e) {
-      throw new IOException(e);
-    } finally {
-      zkw.close();
-    }
-  }
-
-  public static void addHbaseTokenForCred(final Connection conn, User user, Credentials cred)
-          throws IOException, InterruptedException {
-    Token<AuthenticationTokenIdentifier> token = getHbaseAuthToken(conn.getConfiguration(), user);
-    if (token == null) {
-      logger.warn("java.class.path:"+System.getProperty("java.class.path"));
-      ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-      logger.warn("classLoader.getResource(\"\").getPath():"+classLoader.getResource("").getPath());
-      try {
-        classLoader.loadClass("org.apache.hadoop.hbase.LocalHBaseCluster");
-        classLoader.loadClass("org.apache.hadoop.hbase.security.SecurityUtil");
-        classLoader.loadClass("org.apache.hadoop.hbase.security.token.TokenUtil");
-      } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-        throw new IOException(e);
-      }
-      Thread.currentThread().setContextClassLoader(classLoader);
-      token = TokenUtil.obtainToken(conn, user);
-    }
-    cred.addToken(token.getService(), token);
   }
 
   private void fetchHbaseToken(
@@ -989,8 +989,8 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
 //    // 1.x does not have
 //    // support for renewing/cancelling tokens
 //    final String servicePrincipal =
-//        jobConf.get(RM_PRINCIPAL, jobConf.get(JT_PRINCIPAL));
-//    logger.info("servicePrincipal:"+servicePrincipal);
+//            jobConf.get(RM_PRINCIPAL, jobConf.get(JT_PRINCIPAL));
+//    logger.info("servicePrincipal:" + servicePrincipal);
 //    Text rmDelegationTokenService = ClientRMProxy.getRMDelegationTokenService(conf);
 ////    if(rmDelegationTokenService!=null){
 ////      return rmDelegationTokenService;
@@ -998,15 +998,15 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
 //    final Text renewer;
 //    if (servicePrincipal != null) {
 //      String target =
-//          jobConf.get(HADOOP_YARN_RM, jobConf.get(HADOOP_JOB_TRACKER_2));
+//              jobConf.get(HADOOP_YARN_RM, jobConf.get(HADOOP_JOB_TRACKER_2));
 //      if (target == null) {
 //        target = jobConf.get(HADOOP_JOB_TRACKER);
 //      }
-//      logger.info("target:"+target);
+//      logger.info("target:" + target);
 //      final String addr = NetUtils.createSocketAddr(target).getHostName();
-//      logger.info("addr:"+addr);
+//      logger.info("addr:" + addr);
 //      renewer =
-//          new Text(SecurityUtil.getServerPrincipal(servicePrincipal, addr));
+//              new Text(SecurityUtil.getServerPrincipal(servicePrincipal, addr));
 //    } else {
 //      // No security
 //      renewer = DEFAULT_RENEWER;
@@ -1052,6 +1052,6 @@ public class HadoopSecurityManager_H_2_0 extends HadoopSecurityManager {
     };
 
     return RetryingMetaStoreClient
-        .getProxy((Configuration)hiveConf, hookLoader, HiveMetaStoreClient.class.getName());
+            .getProxy((Configuration) hiveConf, hookLoader, HiveMetaStoreClient.class.getName());
   }
 }
